@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: moneytrackr-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - investment-app
+      - investment-service
+    networks:
+      - moneytrackr-network
+    restart: unless-stopped
+
+  investment-app:
+    build:
+      context: ./investment-app
+      dockerfile: Dockerfile
+    container_name: moneytrackr-frontend
+    networks:
+      - moneytrackr-network
+    restart: unless-stopped
+
+  investment-service:
+    build:
+      context: ./investment-service
+      dockerfile: Dockerfile
+    container_name: moneytrackr-backend
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mongodb://mongodb:27017/
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - moneytrackr-network
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: moneytrackr-mongodb
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - moneytrackr-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: moneytrackr-redis
+    networks:
+      - moneytrackr-network
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:
+    driver: local
+
+networks:
+  moneytrackr-network:
+    driver: bridge
