@@ -1,0 +1,388 @@
+openapi: 3.0.0
+
+info:
+  description: Servico responsavel pela gestao de investimentos do MoneyTrackr
+  version: 1.0.0
+  title: investment-service
+
+servers:
+  - url: /v1
+
+paths:
+  /healthy:
+    get:
+      tags:
+        - Sanidade do servico
+      summary: Verificar se o servico esta ativo
+      responses:
+        200:
+          description: Ok.
+        500:
+          description: Erro interno do servidor.
+
+  /public/investment:
+    post:
+      tags:
+        - Metodos publicos - Investment
+      summary: Criacao de investimento
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Investment"
+      responses:
+        201:
+          description: Investimento criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  investmentId:
+                    type: string
+                    description: Identificador do investimento
+        400:
+          description: Parametros invalidos
+        404:
+          description: Dominio inexistente
+        500:
+          description: Falha interna do servidor
+
+  /public/investment/{investmentId}:
+    get:
+      tags:
+        - Metodos publicos - Investment
+      summary: Recupera informacoes de um investimento
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: investmentId
+          in: path
+          description: Identificador do investimento
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investment"
+        404:
+          description: Investimento nao encontrado
+        500:
+          description: Falha interna do servidor
+    put:
+      tags:
+        - Metodos publicos - Investment
+      summary: Atualiza informacoes de um investimento
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: investmentId
+          in: path
+          description: Identificador do investimento
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Investment"
+      responses:
+        200:
+          description: Investimento atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investment"
+        400:
+          description: Parametros invalidos
+        404:
+          description: Investimento nao encontrado
+        500:
+          description: Falha interna do servidor
+    delete:
+      tags:
+        - Metodos publicos - Investment
+      summary: Remove um investimento
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: investmentId
+          in: path
+          description: Identificador do investimento
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Ok
+        404:
+          description: Investimento nao encontrado
+        500:
+          description: Falha interna do servidor
+
+  /public/investment/portfolio/{portfolioId}:
+    get:
+      tags:
+        - Metodos publicos - Investment
+      summary: Recupera investimentos por portfolio
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: portfolioId
+          in: path
+          description: Identificador do portfolio
+          required: true
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Campo para ordenacao
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Limite de registros
+          required: false
+          schema:
+            type: integer
+        - name: skip
+          in: query
+          description: Pular registros
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Investment"
+        404:
+          description: Investimentos nao encontrados
+        500:
+          description: Falha interna do servidor
+
+  /public/investment/{investmentId}/transaction:
+    post:
+      tags:
+        - Metodos publicos - Investment
+      summary: Adiciona transacao ao investimento
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: investmentId
+          in: path
+          description: Identificador do investimento
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Transaction"
+      responses:
+        200:
+          description: Transacao adicionada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investment"
+        400:
+          description: Parametros invalidos
+        404:
+          description: Investimento nao encontrado
+        500:
+          description: Falha interna do servidor
+
+  /public/investment/{investmentId}/price:
+    patch:
+      tags:
+        - Metodos publicos - Investment
+      summary: Atualiza preco atual do investimento
+      description: As informacoes do dominio do cliente sao recuperadas do token de autenticacao.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: investmentId
+          in: path
+          description: Identificador do investimento
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPrice
+              properties:
+                currentPrice:
+                  type: number
+                  description: Preco atual do ativo
+      responses:
+        200:
+          description: Preco atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investment"
+        400:
+          description: Parametros invalidos
+        404:
+          description: Investimento nao encontrado
+        500:
+          description: Falha interna do servidor
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+
+  schemas:
+    Transaction:
+      type: object
+      required:
+        - type
+        - date
+        - quantity
+        - price
+      properties:
+        type:
+          type: string
+          description: Tipo de transacao
+          enum: [BUY, SELL, DIVIDEND, INTEREST, SPLIT, OTHER]
+        date:
+          type: string
+          format: date-time
+          description: Data da transacao
+        quantity:
+          type: number
+          description: Quantidade
+        price:
+          type: number
+          description: Preco unitario
+        fees:
+          type: number
+          description: Taxas
+        notes:
+          type: string
+          description: Observacoes
+
+    Investment:
+      type: object
+      required:
+        - portfolioId
+        - symbol
+        - name
+        - type
+      properties:
+        _id:
+          type: string
+          description: Identificador do investimento
+        portfolioId:
+          type: string
+          description: Identificador do portfolio
+        symbol:
+          type: string
+          description: Simbolo do ativo
+        name:
+          type: string
+          description: Nome do ativo
+        type:
+          type: string
+          description: Tipo de investimento
+          enum: [STOCK, BOND, FUND, ETF, CRYPTO, REAL_ESTATE, FIXED_INCOME, OTHER]
+        status:
+          type: string
+          description: Status do investimento
+          enum: [ACTIVE, SOLD, MATURED, CANCELLED]
+          default: ACTIVE
+        currency:
+          type: string
+          description: Moeda
+          default: BRL
+        quantity:
+          type: number
+          description: Quantidade atual
+        averagePrice:
+          type: number
+          description: Preco medio de aquisicao
+        currentPrice:
+          type: number
+          description: Preco atual
+        totalCost:
+          type: number
+          description: Custo total
+        currentValue:
+          type: number
+          description: Valor atual
+        profitLoss:
+          type: number
+          description: Lucro/prejuizo
+        profitLossPercent:
+          type: number
+          description: Lucro/prejuizo percentual
+        transactions:
+          type: array
+          description: Transacoes
+          items:
+            $ref: "#/components/schemas/Transaction"
+        purchaseDate:
+          type: string
+          format: date-time
+          description: Data de compra
+        saleDate:
+          type: string
+          format: date-time
+          description: Data de venda
+        maturityDate:
+          type: string
+          format: date-time
+          description: Data de vencimento
+        interestRate:
+          type: number
+          description: Taxa de juros
+        broker:
+          type: string
+          description: Corretora
+        notes:
+          type: string
+          description: Observacoes
+        tags:
+          type: array
+          description: Tags
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criacao
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data de atualizacao
