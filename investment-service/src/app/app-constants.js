@@ -77,6 +77,37 @@ const APP_CONSTANTS = {
       code: 'INVESTMENT_FETCH_ERROR',
       message: 'Investment fetch error',
     },
+    // Wallet errors
+    WALLET_NAME_REQUIRED: {
+      statusCode: 400,
+      code: 'WALLET_NAME_REQUIRED',
+      message: 'Nome da carteira é obrigatório',
+    },
+    WALLET_NAME_TOO_LONG: {
+      statusCode: 400,
+      code: 'WALLET_NAME_TOO_LONG',
+      message: 'Nome da carteira deve ter no máximo 50 caracteres',
+    },
+    WALLET_ALREADY_EXISTS: {
+      statusCode: 409,
+      code: 'WALLET_ALREADY_EXISTS',
+      message: 'Já existe uma carteira com este nome',
+    },
+    WALLET_NOT_FOUND: {
+      statusCode: 404,
+      code: 'WALLET_NOT_FOUND',
+      message: 'Carteira não encontrada',
+    },
+    WALLET_CANNOT_DELETE_ONLY: {
+      statusCode: 422,
+      code: 'WALLET_CANNOT_DELETE_ONLY',
+      message: 'Não é possível excluir a única carteira',
+    },
+    WALLET_CANNOT_CHANGE_CURRENCY: {
+      statusCode: 422,
+      code: 'WALLET_CANNOT_CHANGE_CURRENCY',
+      message: 'Não é possível alterar a moeda de uma carteira com transações',
+    },
   },
   INVESTMENT_TYPES: {
     STOCK: 'STOCK',
