@@ -1,13 +1,21 @@
 /*eslint-env jest*/
 jest.setTimeout(60000)
 
+// Mock interact-utils - Jest will automatically use __mocks__/interact-utils.js
+jest.mock('interact-utils')
+
 const AppTest = require('../__mocks__/app-base-test.js')
 const config = require('../__mocks__/app.config.js')
 const { Permissions } = require('interact-utils')
+const jwt = require('jsonwebtoken')
+const { userSchema } = require('../app/auth/user-model')
+const { v4: uuidv4 } = require('uuid')
 
 describe('Investment API', () => {
   let appTest
   let loggedAgent
+  let token
+  let testUser
 
   const credentials = {
     domain: 'test',
@@ -18,6 +26,38 @@ describe('Investment API', () => {
   beforeAll(async () => {
     appTest = await AppTest.createApp(config)
     loggedAgent = await AppTest.createAgent(appTest, credentials, config.tokenSecret)
+
+    // Create User model
+    const User = appTest.database.model('user', userSchema)
+
+    // Create test user
+    testUser = await User.create({
+      _id: uuidv4(),
+      email: 'test@example.com',
+      name: 'Test User',
+      password: 'hashedpassword',
+      provider: 'local',
+      status: 'active',
+    })
+
+    // Create JWT token with correct payload structure
+    const payload = {
+      userId: testUser._id,
+      email: testUser.email,
+      name: testUser.name,
+    }
+    token = jwt.sign(payload, process.env.JWT_SECRET || config.auth.jwtSecret, { expiresIn: '24h' })
+
+    // Create session in Redis
+    const sessionId = uuidv4()
+    const sessionKey = `session:${testUser._id}:${sessionId}`
+    const decoded = jwt.decode(token)
+    const ttl = config.auth.sessionTTLSeconds || 86400
+    await appTest.service.appManager.getRedisClient().set(sessionKey, JSON.stringify({
+      token,
+      createdAt: Date.now(),
+      expiresAt: decoded.exp * 1000,
+    }), { EX: ttl })
   })
 
   beforeEach(async () => {
@@ -51,6 +91,7 @@ describe('Investment API', () => {
 
       const response = await loggedAgent
         .post('/v1/public/investment')
+        .set('Authorization', `Bearer ${token}`)
         .send(investmentData)
 
       expect(response.status).toBe(201)
@@ -65,6 +106,7 @@ describe('Investment API', () => {
 
       const response = await loggedAgent
         .post('/v1/public/investment')
+        .set('Authorization', `Bearer ${token}`)
         .send(investmentData)
 
       expect(response.status).toBe(400)
@@ -73,14 +115,18 @@ describe('Investment API', () => {
 
   describe('GET /v1/public/investment/:investmentId', () => {
     it('should return 404 for non-existent investment', async () => {
-      const response = await loggedAgent.get('/v1/public/investment/non-existent-id')
+      const response = await loggedAgent
+        .get('/v1/public/investment/non-existent-id')
+        .set('Authorization', `Bearer ${token}`)
       expect(response.status).toBe(404)
     })
   })
 
   describe('GET /v1/public/investment/portfolio/:portfolioId', () => {
     it('should return empty array for non-existent portfolio', async () => {
-      const response = await loggedAgent.get('/v1/public/investment/portfolio/non-existent-portfolio')
+      const response = await loggedAgent
+        .get('/v1/public/investment/portfolio/non-existent-portfolio')
+        .set('Authorization', `Bearer ${token}`)
       expect(response.status).toBe(200)
       expect(response.body).toEqual([])
     })

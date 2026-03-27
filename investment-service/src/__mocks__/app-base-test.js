@@ -13,8 +13,57 @@ const createRedisMock = () => {
 
   redisMock.createClient = (options) => {
     const client = originalCreateClient(options)
+
+    // Add connect and quit as promises
     client.connect = () => Promise.resolve()
     client.quit = () => Promise.resolve()
+
+    // Promisify all Redis methods for Redis v4 API compatibility
+    const originalGet = client.get.bind(client)
+    const originalSet = client.set.bind(client)
+    const originalDel = client.del.bind(client)
+    const originalKeys = client.keys.bind(client)
+
+    client.get = (key) => new Promise((resolve, reject) => {
+      originalGet(key, (err, reply) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(reply)
+        }
+      })
+    })
+
+    client.set = (key, value, options) => new Promise((resolve, reject) => {
+      originalSet(key, value, (err, reply) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(reply)
+        }
+      })
+    })
+
+    client.del = (key) => new Promise((resolve, reject) => {
+      originalDel(key, (err, reply) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(reply)
+        }
+      })
+    })
+
+    client.keys = (pattern) => new Promise((resolve, reject) => {
+      originalKeys(pattern, (err, reply) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(reply)
+        }
+      })
+    })
+
     return client
   }
 

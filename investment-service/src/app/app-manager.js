@@ -1,6 +1,7 @@
 const AppDB = require('./app-db')
 const { SERVICE_NAME } = require('./app-constants')
 const InvestmentManager = require('./investment/investment-manager')
+const AuthManager = require('./auth/auth-manager')
 const { JsonLog } = require('json-log-middleware')
 const redis = require('redis')
 const logger = new JsonLog(SERVICE_NAME)
@@ -30,16 +31,26 @@ class AppManager {
     this.investmentManager = new InvestmentManager(this, this.appDB)
     this.investmentManager.inicialize(this)
 
+    // Initialize AuthManager
+    this.authManager = new AuthManager(this, this.appDB)
+    this.authManager.inicialize(this)
+
     logger.log('Servico inicializado com sucesso', { internal: { method: 'initialize', filename: 'app-manager.js' } })
   }
 
   _createRedisClient(redisConfig) {
     const client = redis.createClient({
-      host: redisConfig.host,
-      port: redisConfig.port,
+      socket: {
+        host: redisConfig.host,
+        port: redisConfig.port,
+      },
     })
     client.on('error', (err) => {
       logger.error('Erro Redis', err, { internal: { method: '_createRedisClient', filename: 'app-manager.js' } })
+    })
+    // Connect is async in Redis v4
+    client.connect().catch((err) => {
+      logger.error('Erro ao conectar Redis', err, { internal: { method: '_createRedisClient', filename: 'app-manager.js' } })
     })
     return client
   }
@@ -50,6 +61,10 @@ class AppManager {
 
   getInvestmentManager() {
     return this.investmentManager
+  }
+
+  getAuthManager() {
+    return this.authManager
   }
 
   getRedisClient() {
