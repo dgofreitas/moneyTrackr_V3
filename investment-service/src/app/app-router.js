@@ -2,6 +2,7 @@ const express = require('express')
 const { JsonLog } = require('json-log-middleware')
 const { SERVICE_NAME } = require('./app-constants')
 const WalletRouter = require('./wallet/wallet-router')
+const AuthRouter = require('./auth/auth-router')
 const InvestmentRouter = require('./investment/investment-router')
 const logger = new JsonLog(SERVICE_NAME)
 
@@ -22,6 +23,13 @@ class AppRouter {
     router.use('/v1', WalletRouter.getRoutes(appManager))
 
     // Investment routes
+    // Auth public routes
+    router.use(AuthRouter.getPublicRoutes(appManager))
+
+    // Auth protected routes
+    router.use(AuthRouter.getProtectedRoutes(appManager, appManager.config))
+
+    // Investment routes (using Authorizer middleware)
     router.use('/v1/public', InvestmentRouter.getPublicRoutes(appManager))
 
     return router

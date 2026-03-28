@@ -20,6 +20,14 @@ class InvestmentManager {
   async createInvestment({ domain, investmentInfo }) {
     logger.log('Criando investimento', { domain, investmentInfo: JSON.stringify(investmentInfo), internal: { filename: 'investment-manager.js', method: 'createInvestment' } })
 
+    // Validate required fields
+    const requiredFields = ['portfolioId', 'symbol', 'name', 'type']
+    for (const field of requiredFields) {
+      if (!investmentInfo[field]) {
+        this.handleError(APP_CONSTANTS.ERRORS.VALIDATION_ERROR)
+      }
+    }
+
     const existingInvestment = await this.investmentDAO.findOne({
       domain,
       portfolioId: investmentInfo.portfolioId,
@@ -87,6 +95,10 @@ class InvestmentManager {
       }
       return investment
     } catch (error) {
+      // If error already has a statusCode, rethrow it
+      if (error.statusCode) {
+        throw error
+      }
       logger.error('Erro ao buscar investimento', error, {
         domain,
         investmentId,

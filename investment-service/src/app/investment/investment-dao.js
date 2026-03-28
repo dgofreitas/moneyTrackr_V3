@@ -5,6 +5,7 @@ class InvestmentDAO extends AppDAO {
 
   constructor(db) {
     super(db)
+    this.objectModel = this.initializeDBModel(db)
   }
 
   initializeDBModel(db) {

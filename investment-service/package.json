@@ -20,21 +20,33 @@
     "preset": "@shelf/jest-mongodb",
     "testMatch": [
       "<rootDir>/src/__tests__/**/*.test.js"
-    ]
+    ],
+    "setupFiles": [
+      "<rootDir>/src/__mocks__/jest-setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/__mocks__/jest-setup.js"
+    ],
+    "moduleNameMapper": {
+      "^interact-utils$": "<rootDir>/__mocks__/interact-utils.js"
+    }
   },
   "author": "MoneyTrackr",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "express-rate-limit": "^7.5.0",
     "helmet": "^7.1.0",
     "interact-utils": "^1.39.9",
     "json-log-middleware": "^1.1.1",
     "jsonwebtoken": "^9.0.2",
     "jws": "^4.0.1",
     "mongoose": "^8.7.0",
+    "nodemailer": "^6.9.16",
     "redis": "^4.6.13",
     "uuid": "^9.0.1"
   },
