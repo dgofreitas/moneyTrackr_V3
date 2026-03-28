@@ -1,6 +1,7 @@
 const AppDB = require('./app-db')
 const { SERVICE_NAME } = require('./app-constants')
 const InvestmentManager = require('./investment/investment-manager')
+const WalletManager = require('./wallet/wallet-manager')
 const AuthManager = require('./auth/auth-manager')
 const { JsonLog } = require('json-log-middleware')
 const redis = require('redis')
@@ -31,6 +32,9 @@ class AppManager {
     this.investmentManager = new InvestmentManager(this, this.appDB)
     this.investmentManager.inicialize(this)
 
+    // Initialize WalletManager
+    this.walletManager = new WalletManager(this, this.appDB)
+    this.walletManager.inicialize(this)
     // Initialize AuthManager
     this.authManager = new AuthManager(this, this.appDB)
     this.authManager.inicialize(this)
@@ -63,6 +67,8 @@ class AppManager {
     return this.investmentManager
   }
 
+  getWalletManager() {
+    return this.walletManager
   getAuthManager() {
     return this.authManager
   }
