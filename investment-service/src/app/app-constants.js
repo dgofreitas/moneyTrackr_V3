@@ -107,6 +107,7 @@ const APP_CONSTANTS = {
       statusCode: 422,
       code: 'WALLET_CANNOT_CHANGE_CURRENCY',
       message: 'Não é possível alterar a moeda de uma carteira com transações',
+    },
     // Auth errors
     INVALID_CREDENTIALS: {
       statusCode: 401,
@@ -217,6 +218,67 @@ const APP_CONSTANTS = {
       statusCode: 500,
       code: 'JWT_SECRET_NOT_CONFIGURED',
       message: 'JWT_SECRET nao configurado',
+    },
+    // Transaction errors
+    TRANSACTION_NOT_FOUND: {
+      statusCode: 404,
+      code: 'TRANSACTION_NOT_FOUND',
+      message: 'Transacao nao encontrada.',
+    },
+    INVALID_TRANSACTION_TYPE: {
+      statusCode: 400,
+      code: 'INVALID_TRANSACTION_TYPE',
+      message: 'Tipo de transacao invalido. Use BUY ou SELL.',
+    },
+    TICKER_REQUIRED: {
+      statusCode: 400,
+      code: 'TICKER_REQUIRED',
+      message: 'Ticker e obrigatorio.',
+    },
+    INVALID_QUANTITY: {
+      statusCode: 400,
+      code: 'INVALID_QUANTITY',
+      message: 'Quantidade deve ser maior que zero.',
+    },
+    INVALID_PRICE: {
+      statusCode: 400,
+      code: 'INVALID_PRICE',
+      message: 'Preco deve ser maior que zero.',
+    },
+    INVALID_FEES: {
+      statusCode: 400,
+      code: 'INVALID_FEES',
+      message: 'Taxas nao podem ser negativas.',
+    },
+    DATE_REQUIRED: {
+      statusCode: 400,
+      code: 'DATE_REQUIRED',
+      message: 'Data da transacao e obrigatoria.',
+    },
+    FUTURE_DATE_NOT_ALLOWED: {
+      statusCode: 400,
+      code: 'FUTURE_DATE_NOT_ALLOWED',
+      message: 'Data da transacao nao pode ser futura.',
+    },
+    NO_POSITION_FOR_ASSET: {
+      statusCode: 422,
+      code: 'NO_POSITION_FOR_ASSET',
+      message: 'Voce nao possui posicao neste ativo nesta carteira.',
+    },
+    INSUFFICIENT_QUANTITY: {
+      statusCode: 422,
+      code: 'INSUFFICIENT_QUANTITY',
+      message: 'Quantidade insuficiente para venda.',
+    },
+    POSITION_CONFLICT: {
+      statusCode: 422,
+      code: 'POSITION_CONFLICT',
+      message: 'A alteracao resultaria em posicao negativa.',
+    },
+    TRANSACTION_ALREADY_DELETED: {
+      statusCode: 404,
+      code: 'TRANSACTION_ALREADY_DELETED',
+      message: 'Transacao ja foi excluida.',
     },
   },
   INVESTMENT_TYPES: {

@@ -9,6 +9,9 @@ import ProtectedRoute from '../components/common/ProtectedRoute.vue'
 
 // Lazy load protected pages
 const DashboardPage = () => import('../pages/DashboardPage.vue')
+const TransactionsPage = () => import('../pages/transactions/TransactionsPage.vue')
+const TransactionFormPage = () => import('../pages/transactions/TransactionFormPage.vue')
+const PositionsPage = () => import('../pages/positions/PositionsPage.vue')
 
 const routes = [
   {
@@ -44,6 +47,30 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/transactions',
+    name: 'transactions',
+    component: TransactionsPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/transactions/new',
+    name: 'new-transaction',
+    component: TransactionFormPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/transactions/:id/edit',
+    name: 'edit-transaction',
+    component: TransactionFormPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/positions',
+    name: 'positions',
+    component: PositionsPage,
     meta: { requiresAuth: true },
   },
   {

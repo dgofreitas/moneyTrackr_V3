@@ -3,6 +3,8 @@ const { SERVICE_NAME } = require('./app-constants')
 const InvestmentManager = require('./investment/investment-manager')
 const WalletManager = require('./wallet/wallet-manager')
 const AuthManager = require('./auth/auth-manager')
+const TransactionManager = require('./transaction/transaction-manager')
+const PositionManager = require('./position/position-manager')
 const { JsonLog } = require('json-log-middleware')
 const redis = require('redis')
 const logger = new JsonLog(SERVICE_NAME)
@@ -38,6 +40,12 @@ class AppManager {
     // Initialize AuthManager
     this.authManager = new AuthManager(this, this.appDB)
     this.authManager.inicialize(this)
+    // Initialize PositionManager
+    this.positionManager = new PositionManager(this, this.appDB)
+    this.positionManager.inicialize(this)
+    // Initialize TransactionManager
+    this.transactionManager = new TransactionManager(this, this.appDB)
+    this.transactionManager.inicialize(this)
 
     logger.log('Servico inicializado com sucesso', { internal: { method: 'initialize', filename: 'app-manager.js' } })
   }
@@ -69,6 +77,16 @@ class AppManager {
 
   getWalletManager() {
     return this.walletManager
+  }
+
+  getPositionManager() {
+    return this.positionManager
+  }
+
+  getTransactionManager() {
+    return this.transactionManager
+  }
+
   getAuthManager() {
     return this.authManager
   }

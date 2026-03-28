@@ -4,6 +4,7 @@ const { SERVICE_NAME } = require('./app-constants')
 const WalletRouter = require('./wallet/wallet-router')
 const AuthRouter = require('./auth/auth-router')
 const InvestmentRouter = require('./investment/investment-router')
+const TransactionRouter = require('./transaction/transaction-router')
 const logger = new JsonLog(SERVICE_NAME)
 
 class AppRouter {
@@ -21,6 +22,9 @@ class AppRouter {
 
     // Wallet routes
     router.use('/v1', WalletRouter.getRoutes(appManager))
+
+    // Transaction routes
+    router.use('/v1', TransactionRouter.getRoutes(appManager))
 
     // Investment routes
     // Auth public routes
